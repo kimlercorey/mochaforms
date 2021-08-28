@@ -63,5 +63,3 @@ final class MochaForms {
 
 
 }
-
-mochaforms();
