@@ -20,9 +20,8 @@ Text Domain: mochaforms
  * Released under the GPL license
  * http://www.opensource.org/licenses/gpl-license.php
  *
- * This is an add-on for WordPress
- * http://wordpress.org/
- *
+ * This is an add-on for WordPress <http://wordpress.org/>
+ * 
  * **********************************************************************
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,11 +42,10 @@ Text Domain: mochaforms
 // Ensure Wordperfect context
 defined( 'ABSPATH') or die( 'Missing Wordpress Context' );
 
-if (file_exists( dirname( __FILE__) . '/vendor/autoload.php')) {
-    require_once dirname( __FILE__) . '/vendor/autoload.php';
-}
+// if (file_exists( dirname( __FILE__) . '/vendor/autoload.php')) {
+//     require_once dirname( __FILE__) . '/vendor/autoload.php';
+// }
 
-use INC\Util;
 
 class MochaForms {
     
@@ -121,7 +119,7 @@ if ( class_exists( 'MochaForms' ) ) {
     
 }
 
-//require_once plugin_dir_path( __FILE__ ) . 'inc/mochaforms-util.php';
+require_once plugin_dir_path( __FILE__ ) . 'inc/util.php';
 
 
 register_activation_hook( __FILE__, array($mochaForms, 'activate') );

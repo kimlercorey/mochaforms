@@ -2,7 +2,6 @@
 /**
  *  @package MochaForms
  */
-namespace INC;
 
  class Util {
 
