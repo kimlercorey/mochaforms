@@ -1,0 +1,22 @@
+{
+    "name": "mochaforms/mochaforms",
+    "description": "WPA complete form generator solution for wordpress focused on simple setup.",
+    "type": "project",
+    "license": "GPL",
+    "autoload": {
+        "psr-4": {
+            "Mochaforms\\Mochaforms\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "kimler",
+            "email": "admin@mochaforms.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}, 
+    "autoload": {
+        "psr-4": {"INC\\": "./inc"}
+    }
+}
