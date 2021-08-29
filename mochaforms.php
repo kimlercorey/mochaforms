@@ -7,8 +7,8 @@ Plugin Name: MochaForms
 Plugin URI: http://mochaforms.com/plugin
 Description: A complete form generator solution for wordpress focused on simple setup.
 Version: 1.0.5
-Author: MochaForms Team
-Author URI: http://mochaforms.com/team
+Author: MochaForms
+Author URI: http://mochaforms.com/
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: mochaforms
@@ -49,10 +49,12 @@ defined( 'ABSPATH') or die( 'Missing Wordpress Context' );
 
 class MochaForms {
     
-    public $plugin_name; 
+    public $plugin_name;
+    public $plugin_path; 
 
     function __construct() {
         $this->plugin_name = plugin_basename( __FILE__ );
+        $this->plugin_path = plugin_dir_path( __FILE__ );
         $this->init();
     }
 
@@ -82,9 +84,6 @@ class MochaForms {
 
         add_action( 'admin_menu', [$this, 'admin_menu_pages'] );
         add_filter( "plugin_action_links_$this->plugin_name" , array($this, 'settings_link') );
-
-        
-
     }
 
     function settings_link($links){
@@ -100,7 +99,7 @@ class MochaForms {
 
     function admin_index() {
         // Require templates
-        require_once plugin_dir_path( __FILE__ ) . 'templates/admin.php';
+        require_once $this->plugin_path . 'templates/admin.php';
     }
 
     function activate(){
@@ -110,17 +109,22 @@ class MochaForms {
     function deactivate(){
         Util::deactivate();
     }
+
+    static function autoload($path='inc'){
+        $dir = new RecursiveDirectoryIterator(plugin_dir_path( __FILE__ ) . $path);
+        foreach ( new RecursiveIteratorIterator($dir) as $file) {
+            if (!is_dir($file)) {
+                if( fnmatch('*.php', $file) ) 
+                require_once $file;
+            }
+        }
+    }
 }
 
 if ( class_exists( 'MochaForms' ) ) {
-    
     $mochaForms = new MochaForms();
-    
-    
+    MochaForms::autoload();
 }
-
-require_once plugin_dir_path( __FILE__ ) . 'inc/util.php';
-
 
 register_activation_hook( __FILE__, array($mochaForms, 'activate') );
 register_deactivation_hook( __FILE__, array($mochaForms, 'deactivate') );
