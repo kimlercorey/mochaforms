@@ -42,89 +42,42 @@ Text Domain: mochaforms
 // Ensure Wordperfect context
 defined( 'ABSPATH') or die( 'Missing Wordpress Context' );
 
-// if (file_exists( dirname( __FILE__) . '/vendor/autoload.php')) {
-//     require_once dirname( __FILE__) . '/vendor/autoload.php';
-// }
+//Require Once Class Auto loader
+require_once dirname( __FILE__) . '/inc/base/util.class.php';
 
-
-class MochaForms {
+final class MochaForms {
     
-    public $plugin_name;
-    public $plugin_path; 
+    public $admin;
 
     function __construct() {
-        $this->plugin_name = plugin_basename( __FILE__ );
-        $this->plugin_path = plugin_dir_path( __FILE__ );
+        define( 'MF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+        define( 'MF_PLUGIN_NAME', plugin_basename( __FILE__ ) );
+        define( 'MF_PLUGINS_URL', plugins_url( '', __FILE__ ) );
+
         $this->init();
+        Util::autoload();
+
+        $this->admin = new Admin();
+
+        register_activation_hook( __FILE__, ['Util', 'activate'] );
+        register_deactivation_hook( __FILE__, ['Util', 'deactivate'] );
     }
 
-    // uninstall is handle via uninstall.php which is automatically invoked on uninstall 
-
-    function custom_post_type() {
-        register_post_type( 'form', ['public' => true, 'label' => 'Forms'] );
+    function menuPages(){
+        $this->admin->menu_pages();
     }
 
-    function admin_enqueue(){
-        // enqueue scripts from assets
-        wp_enqueue_style( 'mochaform_style', plugins_url( '/assets/admin_style.css', __FILE__ ) );
-        wp_enqueue_script( 'mochaform_script', plugins_url( '/assets/admin_script.js', __FILE__ ) );
-    }
+    protected function init(){ 
+        add_action( 'init', ['Client', 'custom_post_type'] );
+        add_action( 'wp_enqueue_scripts', ['Client', 'client_enqueue'] );
+        //add_action( 'admin_enqueue_scripts',  [$this->admin, 'admin_enqueue'] );
+        add_action( 'admin_menu', [$this, 'menuPages'] );
 
-    function client_enqueue(){
-        // enqueue scripts from assets
-        wp_enqueue_style( 'mochaform_client_style', plugins_url( '/assets/style.css', __FILE__ ) );
-        wp_enqueue_script( 'mochaform_client_script', plugins_url( '/assets/script.js', __FILE__ ) );
-    }
-
-    protected function init(){
-        add_action( 'init', array( $this, 'custom_post_type') );
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue') );
-        add_action( 'wp_enqueue_scripts', array( $this, 'client_enqueue') );
-        //$this->custom_post_type();
-
-        add_action( 'admin_menu', [$this, 'admin_menu_pages'] );
-        add_filter( "plugin_action_links_$this->plugin_name" , array($this, 'settings_link') );
-    }
-
-    function settings_link($links){
-         // add custom settings links
-         $settings_link = '<a href="admin.php?page=mocha_forms">Settings</a>';
-         array_push($links, $settings_link);
-         return $links;
-    }
-
-    function admin_menu_pages() {    
-        add_menu_page( 'Mocha Forms', 'MochaForms', 'manage_options', 'mocha_forms', array($this, 'admin_index'), 'dashicons-feedback', null );
-    }
-
-    function admin_index() {
-        // Require templates
-        require_once $this->plugin_path . 'templates/admin.php';
-    }
-
-    function activate(){
-        Util::activate();
-    }
-
-    function deactivate(){
-        Util::deactivate();
-    }
-
-    static function autoload($path='inc'){
-        $dir = new RecursiveDirectoryIterator(plugin_dir_path( __FILE__ ) . $path);
-        foreach ( new RecursiveIteratorIterator($dir) as $file) {
-            if (!is_dir($file)) {
-                if( fnmatch('*.php', $file) ) 
-                require_once $file;
-            }
-        }
+        add_filter( 'plugin_action_links_'.MF_PLUGIN_NAME , ['Admin', 'settings_link'] );
     }
 }
 
 if ( class_exists( 'MochaForms' ) ) {
     $mochaForms = new MochaForms();
-    MochaForms::autoload();
+    
 }
-
-register_activation_hook( __FILE__, array($mochaForms, 'activate') );
-register_deactivation_hook( __FILE__, array($mochaForms, 'deactivate') );
