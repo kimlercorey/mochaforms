@@ -53,7 +53,8 @@ final class MochaForms {
         define( 'MF_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
         define( 'MF_PLUGIN_NAME', plugin_basename( __FILE__ ) );
         define( 'MF_PLUGINS_URL', plugins_url( '', __FILE__ ) );
-
+        define( 'MF_TEMPLATE_URL',MF_PLUGIN_PATH.'/templates/' );
+        
         $this->init();
         Util::autoload();
 
@@ -67,10 +68,14 @@ final class MochaForms {
         $this->admin->menu_pages();
     }
 
+    function admin_enqueue(){
+        $this->admin->admin_enqueue();
+    }
+
     protected function init(){ 
         add_action( 'init', ['Client', 'custom_post_type'] );
         add_action( 'wp_enqueue_scripts', ['Client', 'client_enqueue'] );
-        //add_action( 'admin_enqueue_scripts',  [$this->admin, 'admin_enqueue'] );
+        add_action( 'admin_enqueue_scripts',  [$this, 'admin_enqueue'] );
         add_action( 'admin_menu', [$this, 'menuPages'] );
 
         add_filter( 'plugin_action_links_'.MF_PLUGIN_NAME , ['Admin', 'settings_link'] );
